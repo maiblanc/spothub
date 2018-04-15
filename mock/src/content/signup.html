@@ -1,0 +1,35 @@
+<!-- @@master ../layout/_master.html { "title": "ユーザー登録" } -->
+<!-- content -->
+<!-- @@block content -->
+<article>
+  <div class="container mt-3">
+    <div class="row">
+      <div class="card col-12">
+        <div class="card-body">
+          <form method action>
+            <div class="form-group">
+              <label for="input-email">メールアドレス</label>
+              <input type="text" name="email" class="form-control" id="input-email" placeholder="例）hoge@example.com">
+            </div>
+            <div class="form-group">
+              <label for="input-nickname">ニックネーム</label>
+              <input type="text" name="display_name" class="form-control" id="input-nickname" placeholder="例）ほげほげ">
+            </div>
+            <div class="form-group">
+              <label for="input-password">パスワード</label>
+              <input type="password" name="password" class="form-control" id="input-password" placeholder="6文字以上で設定してください。">
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary">ユーザー登録する</button>
+            </div>
+            <div class="form-group">
+              <p class="text-muted">既にユーザー登録がお済みの方は、<a href="/signin.html">こちら</a>からログインしてください。</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+<!-- @@close -->
+<!-- /content -->

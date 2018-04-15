@@ -11,6 +11,7 @@ const notify = require('gulp-notify');
 const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat');
 const babel = require('gulp-babel');
+const sass = require('gulp-sass');
 
 // browser reload
 gulp.task('default', ['browser-sync']);
@@ -26,7 +27,7 @@ gulp.task('browser-reload', () => {
   browserSync.reload();
 });
 
-// html-extend
+// html-compile
 gulp.task('html-extend', () => {
   gulp.src(srcBaseDir + '/**/[^_]*.html', {
     base: srcBaseDir + '/content'
@@ -43,19 +44,31 @@ gulp.task('html-extend', () => {
 
 // js-compile
 gulp.task('js-compile', () => {
-  gulp.src(srcBaseDir + '/**/*.js')
-      .pipe(sourcemaps.init())
-      .pipe(babel({
-        presets: ['@babel/env']
+  gulp.src(srcBaseDir + '/**/*.js', {
+    base: srcBaseDir
+  })
+      .pipe(plumber({
+        errorHandler: notify.onError("エラー: <%= error.message %>")
       }))
+      .pipe(sourcemaps.init())
+      .pipe(babel())
       .pipe(concat('main.js'))
       .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('./' + destBaseDir))
+      .pipe(gulp.dest('./' + destBaseDir + '/script'));
 });
 
 // sass-compile
 gulp.task('sass-compile', () => {
-
+  gulp.src(srcBaseDir + '/**/*.scss', {
+    base: srcBaseDir
+  })
+    .pipe(plumber({
+      errorHandler: notify.onError("エラー: <%= error.message %>")
+    }))
+    .pipe(sass({
+      outputStyle: 'expanded'
+    }))
+    .pipe(gulp.dest('./' + destBaseDir));
 });
 
 // watch
@@ -63,5 +76,5 @@ gulp.task('default', ['browser-sync'], () => {
   gulp.watch(srcBaseDir + '/**/*.html', ['html-extend']);
   gulp.watch(srcBaseDir + '/**/*.js', ['js-compile']);
   gulp.watch(srcBaseDir + '/**/*.scss', ['sass-compile']);
-  gulp.watch(destBaseDir + '/**/*.html', ['browser-reload']);
+  gulp.watch(destBaseDir + '/**/*.{js,css,html}', ['browser-reload']);
 });

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- start _head.html-->
+<!-- head -->
+<title>
+  ユーザー登録 | SpotHub
+</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<link rel="stylesheet" href="/style/main.css" />
+<!-- /head -->
+<!-- end _head.html-->
+</head>
+
+<body>
+<!-- start _header.html-->
+<!-- header -->
+<header class="sticky-top">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- logo -->
+    <a class="navbar-brand" href="/">SpotHub</a>
+    
+    <!-- pancake -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".header-menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- menu -->
+    <div class="header-menu collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">ホーム</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/mypage.html">マイページ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/mylist.html">マイリスト</a>
+        </li>
+        <!--
+        <li class="nav-item">
+          <a class="nav-link" href="/signup.html">ユーザー登録</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/signin.html">ログイン</a>
+        </li>
+        -->
+      </ul>
+    </div>
+  </nav>
+</header>
+<!-- /header -->
+<!-- end _header.html-->
+  
+<!-- start content -->
+<article>
+  <div class="container mt-3">
+    <div class="row">
+      <div class="card col-12">
+        <div class="card-body">
+          <form method action>
+            <div class="form-group">
+              <label for="input-email">メールアドレス</label>
+              <input type="text" name="email" class="form-control" id="input-email" placeholder="例）hoge@example.com">
+            </div>
+            <div class="form-group">
+              <label for="input-nickname">ニックネーム</label>
+              <input type="text" name="display_name" class="form-control" id="input-nickname" placeholder="例）ほげほげ">
+            </div>
+            <div class="form-group">
+              <label for="input-password">パスワード</label>
+              <input type="password" name="password" class="form-control" id="input-password" placeholder="6文字以上で設定してください。">
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary">ユーザー登録する</button>
+            </div>
+            <div class="form-group">
+              <p class="text-muted">既にユーザー登録がお済みの方は、<a href="/signin.html">こちら</a>からログインしてください。</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- end content -->
+
+<!-- start _footer.html-->
+<!-- footer -->
+<footer class="fixed-bottom d-none d-sm-block">
+  <div class="container-fluid text-center bg-light mt-3 py-3">
+    <span class="text-muted">Copyright © takuya kaneko 2018</span>
+  </div>
+</footer>
+<!-- /footer -->
+<!-- end _footer.html-->
+  
+<!-- start _script.html-->
+<!-- script -->
+<script src="//code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+<script src="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+<script async defer src="//maps.googleapis.com/maps/api/js?key=AIzaSyB_CQzixD7svnyVVbV9FcgOcjpQix3vphE&callback=initMap">
+</script>
+<script src="/script/main.js"></script>
+<!-- /script -->
+<!-- end _script.html-->
+</body>
+
+</html>
