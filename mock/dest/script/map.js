@@ -1,7 +1,6 @@
 /*
  * GoogleMapApiを使用してマップを表示するクラス
  */
- // @flow
 class Map {
   // GoogleMapApiが読み込み完了した際に呼ばれるコールバック
   static loadMap() {
@@ -42,7 +41,8 @@ class Map {
   // searchBoxAPIを初期化
   static initSearchBox() {
     // SearchBoxAPIを初期化
-    let $inputFindQueryPrimitive = $('.input-find-query')[0];
+    let $inputFindQuery = $('.input-find-query');
+    let $inputFindQueryPrimitive = $inputFindQuery[0];
     this._searchBoxApi = new google.maps.places.SearchBox($inputFindQueryPrimitive);
     this._mapApi.controls[google.maps.ControlPosition.TOP_LEFT].push($inputFindQueryPrimitive);
     
@@ -51,7 +51,7 @@ class Map {
       this._searchBoxApi.setBounds(this._mapApi.getBounds());
     });
 
-    // 検索窓の条件が変わったのイベント
+    // 検索窓の条件が変わったときの「イベント
     this._searchBoxApi.addListener('places_changed', () => {
       // 検索条件からプレイスを取得する
       let places = this._searchBoxApi.getPlaces();
@@ -67,17 +67,22 @@ class Map {
       // プレイスからマーカーを設定する
       this.setMarkersFromPlaces(places);
     });
+
+    $inputFindQuery.on('keyup', event => {
+      let $input = $(event.target);
+      if ($input.val().length == 0) {
+        // 検索欄に何も入力されていなければマーカーをすべて削除する
+        this.clearMarkers();
+      }
+    });
   }
 
   // マーカーを追加する
-  static addMarker(position, title, icon) {
-    console.log(`マーカーを追加します。（タイトル：${title}, 位置：(${position.lat}${position.lng})）`);
-    return new google.maps.Marker({
-      map: this._mapApi,
-      icon: icon,
-      title: title,
-      position: position,
-    });
+  static addMarker(markerOption) {
+    console.log(`マーカーを追加します。（タイトル：${markerOption.title}, 位置：(${markerOption.position.lat}${markerOption.position.lng})）`);
+    markerOption.map = this._mapApi;
+    markerOption.animation = google.maps.Animation.DROP;
+    return new google.maps.Marker(markerOption.toObject());
   }
 
   // 全てのマーカーを削除する
@@ -94,25 +99,41 @@ class Map {
   static setMarkersFromPlaces(places) {
     if (places && places.length > 0) {
       let bounds = new google.maps.LatLngBounds();
-      places.forEach(place => {
+      places.forEach((place, index) => {
         if (!place.geometry) {
           // プレイスに位置情報がなければマーカーは設定しない
           return;
         }
 
-        // マーカーを追加する
+        // アイコンを作成する
         let icon = {
           url: place.icon,
           size: new google.maps.Size(75, 75),
           origin: new google.maps.Point(0, 0),
           anchor: new google.maps.Point(17, 34),
-          scaledSize: new google.maps.Size(25, 25)
+          scaledSize: new google.maps.Size(25, 25),
+          labelOrigin: new google.maps.Point(0, 0)
         };
-        
+
+        // マーカーのオプションを作成する
+        let markerOption = new MarkerOption();
+        markerOption.position = Position.createFromLocation(place.geometry.location);
+        markerOption.title = place.name;
+        markerOption.icon = icon;
+        markerOption.label = {
+          text: `${index + 1}`,
+          color: 'tomato',
+          fontFamily: 'Arial,sans-serif',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        };
+
+        // マーカーを追加する
         this._markers.push(
-          this.addMarker(Position.createFromLocation(place.geometry.location), place.name, icon)
+          this.addMarker(markerOption)
         );
 
+        // マップの表示領域をピンの位置を覆うように合わせる
         if (place.geometry.viewport) {
           bounds.union(place.geometry.viewport);
         } else {
