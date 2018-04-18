@@ -93,6 +93,7 @@ class Map {
   // プレイスからマーカーを設定する
   static setMarkersFromPlaces(places) {
     if (places && places.length > 0) {
+      let bounds = new google.maps.LatLngBounds();
       places.forEach(place => {
         if (!place.geometry) {
           // プレイスに位置情報がなければマーカーは設定しない
@@ -107,8 +108,7 @@ class Map {
           anchor: new google.maps.Point(17, 34),
           scaledSize: new google.maps.Size(25, 25)
         };
-
-        let bounds = new google.maps.LatLngBounds();
+        
         this._markers.push(
           this.addMarker(Position.createFromLocation(place.geometry.location), place.name, icon)
         );
@@ -118,6 +118,7 @@ class Map {
         } else {
           bounds.extend(place.geometry.location);
         }
+        this._mapApi.fitBounds(bounds);
       });
     }
   }
