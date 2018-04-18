@@ -8,10 +8,10 @@ const browserSync = require('browser-sync');
 const htmlExtend = require('gulp-html-extend');
 const plumber = require('gulp-plumber');
 const notify = require('gulp-notify');
-const sourcemaps = require('gulp-sourcemaps');
-const concat = require('gulp-concat');
-const babel = require('gulp-babel');
 const sass = require('gulp-sass');
+// const babel = require('gulp-babel');
+// const concat = require('gulp-concat');
+// const sourcemaps = require('gulp-sourcemaps');
 
 // browser reload
 gulp.task('default', ['browser-sync']);
@@ -50,11 +50,12 @@ gulp.task('js-compile', () => {
       .pipe(plumber({
         errorHandler: notify.onError("エラー: <%= error.message %>")
       }))
-      .pipe(sourcemaps.init())
-      .pipe(babel())
-      .pipe(concat('main.js'))
-      .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('./' + destBaseDir + '/script'));
+      /*.pipe(sourcemaps.init())
+      .pipe(babel({
+        presets: ['env']
+      }))
+      .pipe(sourcemaps.write('.'))*/
+      .pipe(gulp.dest('./' + destBaseDir));
 });
 
 // sass-compile

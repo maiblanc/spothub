@@ -4,4 +4,10 @@ html, body {
 
 .map {
   height: 62.5vh;
+  transition: height .3s ease;
+}
+
+.map.collapsed {
+  height: 30vh;
+  transition: height .3s ease;
 }
