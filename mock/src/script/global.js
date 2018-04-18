@@ -4,7 +4,7 @@
 
 // GoogleMapAPIからのコールバックメソッド
 function initMap() {
-  Map.loadMap();
+  Map.load();
 }
 
 // GoogleMapAPIが利用可能になったときに発火されるイベント

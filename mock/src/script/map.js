@@ -2,8 +2,11 @@
  * GoogleMapApiを使用してマップを表示するクラス
  */
 class Map {
+  /* ------------------------------ *
+   * 初期化関連
+   * ------------------------------ */
   // GoogleMapApiが読み込み完了した際に呼ばれるコールバック
-  static loadMap() {
+  static load() {
     // マップキャンバスを取得
     this._$map = $('.map');
     let _$mapPrimitive = this._$map[0];
@@ -23,8 +26,13 @@ class Map {
     this._mapApi.mapTypes.set('style', styleTypes);
     this._mapApi.setMapTypeId('style');
 
+    // ウィンドウサイズが変更された際にマップをリサイズする
+    google.maps.event.addDomListener(window, 'resize', () => {
+      this.resize();
+    });
+
     // 各種APIを初期化
-    this._markers = [];
+    this._spots = [];
     this.initGeocoder();
     this.initSearchBox();
 
@@ -45,7 +53,7 @@ class Map {
     let $inputFindQueryPrimitive = $inputFindQuery[0];
     this._searchBoxApi = new google.maps.places.SearchBox($inputFindQueryPrimitive);
     this._mapApi.controls[google.maps.ControlPosition.TOP_LEFT].push($inputFindQueryPrimitive);
-    
+
     // Mapの表示領域が変わったら検索範囲も変える
     this._mapApi.addListener('bounds_changed', () => {
       this._searchBoxApi.setBounds(this._mapApi.getBounds());
@@ -56,95 +64,60 @@ class Map {
       // 検索条件からプレイスを取得する
       let places = this._searchBoxApi.getPlaces();
 
-      if (places.length == 0)　{
+      if (places.length == 0)　 {
         // TODO: プレイスが何も取得出来なければエラーを表示
         console.info('プレイスが取得出来ませんでした。');
         return;
       }
+
+      console.log(places);
+
       // マーカーを全て削除する
-      this.clearMarkers();
+      this.clearSpots();
 
       // プレイスからマーカーを設定する
-      this.setMarkersFromPlaces(places);
+      this.addSpotsFromPlaces(places);
     });
 
     $inputFindQuery.on('keyup', event => {
       let $input = $(event.target);
       if ($input.val().length == 0) {
         // 検索欄に何も入力されていなければマーカーをすべて削除する
-        this.clearMarkers();
+        this.clearSpots();
       }
     });
   }
 
-  // マーカーを追加する
-  static addMarker(markerOption) {
-    console.log(`マーカーを追加します。（タイトル：${markerOption.title}, 位置：(${markerOption.position.lat}${markerOption.position.lng})）`);
-    markerOption.map = this._mapApi;
-    markerOption.animation = google.maps.Animation.DROP;
-    return new google.maps.Marker(markerOption.toObject());
+  /* ------------------------------ *
+   * 表示関連
+   * ------------------------------ */
+  // マップキャンバスの大きさを更新する
+  static resize() {
+    let center = this._mapApi.getCenter();
+    google.maps.event.trigger(this._mapApi, "resize");
+    this._mapApi.setCenter(center);
+    this.refreshBounds();
   }
 
-  // 全てのマーカーを削除する
-  static clearMarkers() {
-    if (this._markers && this._markers.length > 0) {
-      this._markers.forEach(marker => {
-        marker.setMap(null);
-      });
-      this._markers = [];
-    }
+  // 複数の場所を囲むように表示領域を合わせる
+  static fitBounds(places) {
+    this._bounds = new google.maps.LatLngBounds();
+
+    places.forEach(place => {
+      if (place.geometry.viewport) {
+        this._bounds.union(place.geometry.viewport);
+      } else {
+        this._bounds.extend(place.geometry.location);
+      }
+    });
+    this.refreshBounds();
   }
 
-  // プレイスからマーカーを設定する
-  static setMarkersFromPlaces(places) {
-    if (places && places.length > 0) {
-      let bounds = new google.maps.LatLngBounds();
-      places.forEach((place, index) => {
-        if (!place.geometry) {
-          // プレイスに位置情報がなければマーカーは設定しない
-          return;
-        }
-
-        // アイコンを作成する
-        let icon = {
-          url: place.icon,
-          size: new google.maps.Size(75, 75),
-          origin: new google.maps.Point(0, 0),
-          anchor: new google.maps.Point(17, 34),
-          scaledSize: new google.maps.Size(25, 25),
-          labelOrigin: new google.maps.Point(0, 0)
-        };
-
-        // マーカーのオプションを作成する
-        let markerOption = new MarkerOption();
-        markerOption.position = Position.createFromLocation(place.geometry.location);
-        markerOption.title = place.name;
-        markerOption.icon = icon;
-        markerOption.label = {
-          text: `${index + 1}`,
-          color: 'tomato',
-          fontFamily: 'Arial,sans-serif',
-          fontSize: '14px',
-          fontWeight: 'bold'
-        };
-
-        // マーカーを追加する
-        this._markers.push(
-          this.addMarker(markerOption)
-        );
-
-        // マップの表示領域をピンの位置を覆うように合わせる
-        if (place.geometry.viewport) {
-          bounds.union(place.geometry.viewport);
-        } else {
-          bounds.extend(place.geometry.location);
-        }
-        this._mapApi.fitBounds(bounds);
-      });
-    }
+  // 表示領域を更新する
+  static refreshBounds() {
+    this._mapApi.fitBounds(this._bounds);
+    this._mapApi.panToBounds(this._bounds);
   }
-
-  static setMarkersFromPlace(place) { this.setMarkersFromPlaces([place]); }
 
   // 描画領域を広げる
   static expand() {
@@ -155,16 +128,81 @@ class Map {
   // 描画領域をたたむ
   static collapse() {
     if (!this._$map.hasClass('collapsed'))
-    this._$map.addClass('collapsed');
+      this._$map.addClass('collapsed');
   }
 
   // 地図の中央位置を設定する
-  static get center() {
-    return new Position(this._mapApi.center.lat(), this._mapApi.center.lng());
+  static get center() { return new Position(this._mapApi.center.lat(), this._mapApi.center.lng()); }
+  static set center(position) { this._mapApi.setCenter(position); }
+
+   /* ------------------------------ *
+   * スポット関連
+   * ------------------------------ */
+  // マップにスポットを追加する
+  static addSpot(place, markerOption) {
+    console.log('スポットを追加します。');
+
+    markerOption.map = this._mapApi;
+    markerOption.animation = google.maps.Animation.DROP;
+
+    let spot = new Spot();
+    spot.marker = new google.maps.Marker(markerOption.toObject());
+    spot.geometry = place.geometry;
+    spot.address = place.formatted_address;
+    spot.placeId = place.place_id;
+    if (place.photos.length > 1) {
+      spot.photoUrl = place.photos[0].getUrl({ maxWidth: 1260 });
+    }
+    spot.rating = place.rating;
+    spot.types = place.types;
+    spot.name = place.name;
+    console.log(spot)
+    return spot;
   }
-  static set center(position) {
-    this._mapApi.setCenter(position);
+
+  // 全てのスポットを削除する
+  static clearSpots() {
+    if (this._spots && this._spots.length > 0) {
+      this._spots.forEach(spot => {
+        spot.marker.setMap(null);
+      });
+      this._spots = [];
+    }
   }
+
+  // プレイスからスポットを追加する
+  static addSpotsFromPlaces(places) {
+    if (places && places.length > 0) {
+
+      places.forEach((place, index) => {
+        if (!place.geometry) {
+          // プレイスに位置情報がなければマーカーは設定しない
+          return;
+        }
+
+        // マーカーのオプションを作成する
+        let markerOption = new MarkerOption();
+        markerOption.position = Position.createFromLocation(place.geometry.location);
+        markerOption.title = place.name;
+        markerOption.label = {
+          text: `${index + 1}`,
+          fontFamily: 'Arial,sans-serif',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        };
+
+        // マーカーを追加する
+        this._spots.push(
+          this.addSpot(place, markerOption)
+        );
+
+      });
+      // マップの表示領域をピンの位置を覆うように合わせる
+      this.fitBounds(places);
+    }
+  }
+
+  static addSpotFromPlace(place) { this.addSpotsFromPlaces([place]); }
 
   static searchSpot(text, callback) {
     // Geocoder APIを使用してテキストから住所を検索する
@@ -174,8 +212,4 @@ class Map {
       callback(results, status);
     });
   }
-}
-
-class SpotInfo {
-
 }

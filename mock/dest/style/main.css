@@ -8,6 +8,6 @@ html, body {
 }
 
 .map.collapsed {
-  height: 30vh;
+  height: 20vh;
   transition: height .3s ease;
 }
