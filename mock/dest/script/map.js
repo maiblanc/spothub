@@ -7,6 +7,30 @@ class Map {
    * ------------------------------ */
   // GoogleMapApiが読み込み完了した際に呼ばれるコールバック
   static load() {
+    // APIを初期化
+    if (!this.initCore()) {
+      return;
+    }
+
+    // イベントを初期化
+    this.initEvents();
+
+    // 各種APIを初期化
+    this._spots = [];
+    this.initPlaceService();
+    this.initGeocoder();
+    this.initSearchBox();
+
+    // イベントを発火させる
+    console.info('マップの初期化に成功しました。')
+    $(window).trigger(this.eventMapLoaded, { isSucceed: true });
+
+    // スポット一覧用クラスの初期化
+    DisplaySpotInfo.init();
+  }
+
+  // MapAPIを初期化
+  static initCore() {
     // マップキャンバスを取得
     this._$map = $('.map');
     let _$mapPrimitive = this._$map[0];
@@ -16,7 +40,7 @@ class Map {
       // マップキャンバスが存在しなければ終了
       console.info('ページ内にマップが存在しないため初期化されませんでした。')
       $(window).trigger(this.eventMapLoaded, { isSucceed: false });
-      return;
+      return false;
     }
 
     // APIオブジェクトを初期化
@@ -25,20 +49,7 @@ class Map {
     this._mapApi = new google.maps.Map(_$mapPrimitive, Constants.mapConfig);
     this._mapApi.mapTypes.set('style', styleTypes);
     this._mapApi.setMapTypeId('style');
-
-    // ウィンドウサイズが変更された際にマップをリサイズする
-    google.maps.event.addDomListener(window, 'resize', () => {
-      this.resize();
-    });
-
-    // 各種APIを初期化
-    this._spots = [];
-    this.initGeocoder();
-    this.initSearchBox();
-
-    // イベントを発火させる
-    console.info('マップの初期化に成功しました。')
-    $(window).trigger(this.eventMapLoaded, { isSucceed: true });
+    return true;
   }
 
   // GeoCoderAPIを初期化
@@ -46,7 +57,7 @@ class Map {
     this._geocoderApi = new google.maps.Geocoder();
   }
 
-  // searchBoxAPIを初期化
+  // SearchBoxAPIを初期化
   static initSearchBox() {
     // SearchBoxAPIを初期化
     let $inputFindQuery = $('.input-find-query');
@@ -59,31 +70,37 @@ class Map {
       this._searchBoxApi.setBounds(this._mapApi.getBounds());
     });
 
-    // 検索窓の条件が変わったときの「イベント
+    // 検索窓の条件が変わったときのイベント
     this._searchBoxApi.addListener('places_changed', () => {
-      // 検索条件からプレイスを取得する
-      let places = this._searchBoxApi.getPlaces();
-
-      if (places.length == 0)　 {
-        // TODO: プレイスが何も取得出来なければエラーを表示
-        console.info('プレイスが取得出来ませんでした。');
-        return;
-      }
-
-      console.log(places);
-
-      // マーカーを全て削除する
-      this.clearSpots();
-
-      // プレイスからマーカーを設定する
-      this.addSpotsFromPlaces(places);
+      this.onSearchConditionChanged();
     });
 
+    // 検索窓の入力内容が変わったときのイベント
     $inputFindQuery.on('keyup', event => {
-      let $input = $(event.target);
-      if ($input.val().length == 0) {
-        // 検索欄に何も入力されていなければマーカーをすべて削除する
-        this.clearSpots();
+      this.onSearchConditionTextChanged(event);
+    });
+  }
+
+  // PlaceServiceAPIを初期化
+  static initPlaceService() {
+    this._placeApi = new google.maps.places.PlacesService(this._mapApi);
+  }
+
+  // 各種イベントを初期化
+  static initEvents() {
+    // ウィンドウサイズが変更された際にマップをリサイズする
+    google.maps.event.addDomListener(window, 'resize', () => {
+      this.resize();
+    });
+
+    // スクロール位置によってマップを折りたたみする
+    $(window).on('scroll', () => {
+      let positionY = $(window).scrollTop();
+
+      if (positionY > 0) {
+        this.collapse()
+      } else {
+        this.expand();
       }
     });
   }
@@ -115,8 +132,10 @@ class Map {
 
   // 表示領域を更新する
   static refreshBounds() {
-    this._mapApi.fitBounds(this._bounds);
-    this._mapApi.panToBounds(this._bounds);
+    if (this._bounds) {
+      this._mapApi.fitBounds(this._bounds);
+      this._mapApi.panToBounds(this._bounds);
+    }
   }
 
   // 描画領域を広げる
@@ -135,7 +154,7 @@ class Map {
   static get center() { return new Position(this._mapApi.center.lat(), this._mapApi.center.lng()); }
   static set center(position) { this._mapApi.setCenter(position); }
 
-   /* ------------------------------ *
+  /* ------------------------------ *
    * スポット関連
    * ------------------------------ */
   // マップにスポットを追加する
@@ -150,13 +169,13 @@ class Map {
     spot.geometry = place.geometry;
     spot.address = place.formatted_address;
     spot.placeId = place.place_id;
-    if (place.photos.length > 1) {
+    if (place.photos) {
       spot.photoUrl = place.photos[0].getUrl({ maxWidth: 1260 });
     }
     spot.rating = place.rating;
     spot.types = place.types;
     spot.name = place.name;
-    console.log(spot)
+    // console.log(spot)
     return spot;
   }
 
@@ -167,10 +186,11 @@ class Map {
         spot.marker.setMap(null);
       });
       this._spots = [];
+      DisplaySpotInfo.clear();
     }
   }
 
-  // プレイスからスポットを追加する
+  // プレイスからスポットを追加する(複数)
   static addSpotsFromPlaces(places) {
     if (places && places.length > 0) {
 
@@ -202,8 +222,10 @@ class Map {
     }
   }
 
+  // プレイスからスポットを追加する
   static addSpotFromPlace(place) { this.addSpotsFromPlaces([place]); }
 
+  // スポットを検索する
   static searchSpot(text, callback) {
     // Geocoder APIを使用してテキストから住所を検索する
     this._geocoderApi.geocode({
@@ -211,5 +233,71 @@ class Map {
     }, (results, status) => {
       callback(results, status);
     });
+  }
+
+  // スポット詳細を取得する
+  static getSpotDetail(spot) {
+    this._placeApi.getDetails({
+      placeId: spot.placeId
+    }, (place, status) => {
+      this.onGetSpotDetailFinished(spot, place, status);
+    });
+  }
+  /* ------------------------------ *
+   * イベント関連
+   * ------------------------------ */
+  // 検索欄のオートコンプリートが変更されたときのコールバックメソッド
+  static onSearchConditionChanged() {
+    // 検索条件からプレイスを取得する
+    let places = this._searchBoxApi.getPlaces();
+
+    if (places.length == 0)　 {
+      // TODO: プレイスが何も取得出来なければエラーを表示
+      console.info('プレイスが取得出来ませんでした。');
+      return;
+    }
+
+    // マーカーを全て削除する
+    this.clearSpots();
+
+    // プレイスからスポットとマーカーを設定する
+    this.addSpotsFromPlaces(places);
+
+    // プレイスの詳細を取得しスポットに設定する
+    // this.getSpotDetail();
+
+    // スポットを一覧で表示する
+    this._spots.forEach(spot => {
+      DisplaySpotInfo.add(spot);
+    });
+  }
+
+  // 検索欄のテキストが変更されたときのコールバックメソッド
+  static onSearchConditionTextChanged(event) {
+    let $input = $(event.target);
+    if ($input.val().length == 0) {
+      // 検索欄に何も入力されていなければマーカーをすべて削除する
+      this.clearSpots();
+    }
+  }
+
+  // プレイス検索が完了したときのコールバックメソッド
+  static onSearchSpotFinished(results, status) {
+    if (status === 'ZERO_RESULTS') {
+      console.log('テキストに一致するスポットはありませんでした。');
+      return;
+    } else if (status !== 'OK') {
+      console.log('スポットの検索中にエラーが発生しました。');
+      return;
+    }
+  }
+
+  static onGetSpotDetailFinished(spot, additionalInfo, status) {
+    if (status !== 'OK') {
+      console.log('スポットの詳細を取得中にエラーが発生しました。');
+      return;
+    }
+
+    console.log(additionalInfo);
   }
 }

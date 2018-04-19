@@ -2,12 +2,35 @@ html, body {
   height: 100%;
 }
 
+.hide {
+  display: none;
+}
+
 .map {
   height: 62.5vh;
   transition: height .3s ease;
 }
 
 .map.collapsed {
-  height: 20vh;
+  height: 39.0625vh;
   transition: height .3s ease;
+}
+
+.set-search-condition-wrapper {
+  position: relative;
+}
+
+.set-search-condition-wrapper > div {
+  position: absolute;
+  right: -15px;
+  z-index: 999;
+  background: gray;
+}
+
+.star {
+  color: orange;
+}
+
+.spot-info-heading {
+  line-height: 38px;
 }

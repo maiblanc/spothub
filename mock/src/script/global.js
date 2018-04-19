@@ -9,6 +9,6 @@ function initMap() {
 
 // GoogleMapAPIが利用可能になったときに発火されるイベント
 $(window).on('mapLoaded', () => {
-  Behavior.init();
+  // Map.init();
   // Map.addMarker(Constants.defaultPosition);
 });

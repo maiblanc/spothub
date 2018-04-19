@@ -12,6 +12,7 @@
 <meta name="author" content="">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="/style/main.css" />
 <!-- /head -->
 <!-- end _head.html-->
@@ -23,7 +24,11 @@
 <header class="sticky-top">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- logo -->
-    <a class="navbar-brand" href="/">SpotHub</a>
+
+    <a class="navbar-brand" href="/">
+      <i class="fa fa-map-marker"></i>
+      <span>SpotHub</span>
+    </a>
     
     <!-- pancake -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".header-menu">
@@ -42,12 +47,13 @@
         <li class="nav-item">
           <a class="nav-link" href="/mylist.html">マイリスト</a>
         </li>
+        <!-- スコープアウト
         <li class="nav-item">
           <a class="nav-link" href="/tags.html">タグ一覧</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/users.html">ユーザー一覧</a>
-        </li>
+        </li> -->
         <!--
         <li class="nav-item">
           <a class="nav-link" href="/signup.html">ユーザー登録</a>
@@ -86,9 +92,9 @@
 
 <!-- start _footer.html-->
 <!-- footer -->
-<footer class="fixed-bottom d-none d-sm-block">
+<footer>
   <div class="container-fluid text-center bg-light mt-3 py-3">
-    <span class="text-muted">Copyright © takuya kaneko 2018</span>
+    <img src="http://cultofthepartyparrot.com/parrots/gothparrot.gif">
   </div>
 </footer>
 <!-- /footer -->
@@ -105,7 +111,7 @@
 <script async defer src="//maps.googleapis.com/maps/api/js?key=AIzaSyB_CQzixD7svnyVVbV9FcgOcjpQix3vphE&libraries=places&callback=initMap">
 </script>
 <script src="/script/map.js"></script>
-<script src="/script/behavior.js"></script>
+<script src="/script/spotinfo.js"></script>
 <script src="/script/model.js"></script>
 <script src="/script/constants.js"></script>
 <!-- /script -->

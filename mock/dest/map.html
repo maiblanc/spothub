@@ -12,6 +12,7 @@
 <meta name="author" content="">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="/style/main.css" />
 <!-- /head -->
 <!-- end _head.html-->
@@ -23,7 +24,11 @@
 <header class="sticky-top">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- logo -->
-    <a class="navbar-brand" href="/">SpotHub</a>
+
+    <a class="navbar-brand" href="/">
+      <i class="fa fa-map-marker"></i>
+      <span>SpotHub</span>
+    </a>
     
     <!-- pancake -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".header-menu">
@@ -42,12 +47,13 @@
         <li class="nav-item">
           <a class="nav-link" href="/mylist.html">マイリスト</a>
         </li>
+        <!-- スコープアウト
         <li class="nav-item">
           <a class="nav-link" href="/tags.html">タグ一覧</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/users.html">ユーザー一覧</a>
-        </li>
+        </li> -->
         <!--
         <li class="nav-item">
           <a class="nav-link" href="/signup.html">ユーザー登録</a>
@@ -67,6 +73,15 @@
 <article>
   <!-- place search -->
   <div class="container">
+    <div class="set-search-condition-wrapper">
+      <div>
+        <a href="#" class="btn btn-primary">
+          <i class="fa fa-search-plus"></i>
+          <span>条件</span>
+        </a>
+      </div>
+    </div>
+
     <div class="row">
       <input type="text" class="input-find-query form-control" placeholder="スポットを検索..." />
     </div>
@@ -79,44 +94,48 @@
   <!-- /map -->
   <!-- spot-info -->
   <div class="container">
-    <div class="row spot-info">
-      <div class="card col-12 px-0">
-        <a data-toggle="collapse" href=".info-detail-1" class="card-link">
-          <div class="card-header px-3 py-1">
-            Collapsible Group Item #1
-          </div>
-        </a>
-        <div class="info-detail-1 collapse show" data-parent=".spot-info">
-          <div class="card-body">
-            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-          </div>
-        </div>
-      </div>
-      <div class="card col-12 px-0">
-        <a data-toggle="collapse" href=".info-detail-2" class="card-link">
-          <div class="card-header px-3 py-1">
-            Collapsible Group Item #2
-          </div>
-        </a>
-        <div class="info-detail-2 collapse" data-parent=".spot-info">
-          <div class="card-body">
-            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-          </div>
-        </div>
-      </div>
-      <div class="card col-12 px-0">
-        <a data-toggle="collapse" href=".info-detail-1" class="card-link">
-          <div class="card-header px-3 py-1">
-            Collapsible Group Item #3
-          </div>
-        </a>
-        <div class="info-detail-3 collapse" data-parent=".spot-info">
-          <div class="card-body">
-            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+    <div class="row spot-info-container">
+      <template class="spot-info-template">
+        <!-- spot-info-wrapper -->
+        <div class="spot-info-wrapper col-12 col-lg-6 px-0 px-lg-2 my-lg-3">
+          <div class="card">
+            <a data-toggle="collapse" href=".info-detail" class="spot-info-toggle card-link">
+              <div class="card-header px-3 py-1">
+                <div class="clearfix">
+                  <span class="spot-info-heading">ワカマツヤ（若松家本館）</span>
+                  <button class="btn btn-warning float-right">
+                    <i class="fa fa-map-marker"></i>
+                  </button>
+                </div>
+              </div>
+            </a>
+            <div class="info-detail collapse show" data-parent=".spot-info-container">
+              <img class="spot-info-photo card-img-top rounded-0" src="https://lh3.googleusercontent.com/p/AF1QipNNDdnkpk-Lah5DFFSm6BS1AGgAg80ZaHG8XC9q=w1260-k">
+              <div class="card-body">
+                <h5 class="spot-info-title card-title">ワカマツヤ（若松家本館）</h5>
+
+                <dt>住所</dt>
+                <dd class="spot-info-address">香川県</dd>
+
+                <dt>評価</dt>
+                <dd class="spot-info-rating-wrapper">
+                  <span class="spot-info-rating">4.2</span>
+                </dd>
+              </div>
+            </div>
           </div>
         </div>
+        <!-- /spot-info-wrapper -->
+      </template>
+    </div>
+    <!-- spot-none -->
+    <div class="row spot-none">
+      <div class="col-12 mt-3">
+        <p>ページ上部の検索ボックスに検索したいスポットの名前を入力してみましょう。</p>
+        <p class="text-muted">例） カフェ</p>
       </div>
     </div>
+    <!-- /spot-none -->
   </div>
   <!-- /spot-info -->
 </article>
@@ -126,9 +145,9 @@
 
 <!-- start _footer.html-->
 <!-- footer -->
-<footer class="fixed-bottom d-none d-sm-block">
+<footer>
   <div class="container-fluid text-center bg-light mt-3 py-3">
-    <span class="text-muted">Copyright © takuya kaneko 2018</span>
+    <img src="http://cultofthepartyparrot.com/parrots/gothparrot.gif">
   </div>
 </footer>
 <!-- /footer -->
@@ -145,7 +164,7 @@
 <script async defer src="//maps.googleapis.com/maps/api/js?key=AIzaSyB_CQzixD7svnyVVbV9FcgOcjpQix3vphE&libraries=places&callback=initMap">
 </script>
 <script src="/script/map.js"></script>
-<script src="/script/behavior.js"></script>
+<script src="/script/spotinfo.js"></script>
 <script src="/script/model.js"></script>
 <script src="/script/constants.js"></script>
 <!-- /script -->

@@ -2,14 +2,41 @@ html, body {
   height: 100%;
 }
 
+.hide {
+  display: none;
+}
+
+// マップの表示設定
 .map {
   height: 62.5vh;
   transition:
     height .3s ease;
 
   &.collapsed {
-    height: 20vh;
+    height: 39.0625vh;
     transition:
       height .3s ease;
   }
+}
+
+.set-search-condition-wrapper {
+  position: relative;
+
+  & > div {
+    position: absolute;
+    right: -15px;
+    z-index: 999;
+
+    background: gray;
+  }  
+}
+
+// 評価の★の色
+.star {
+  color: orange;
+}
+
+// アコーディオンの見出しの高さ
+.spot-info-heading {
+  line-height: 38px;
 }
